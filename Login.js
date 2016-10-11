@@ -33,7 +33,8 @@ const styles = StyleSheet.create({
 		textAlign:'center'
 	},
 	input:{
-		height:50
+		height:50,
+		marginTop:10
 	}
 
 });
