@@ -11,6 +11,7 @@ import {
   Image,
   View
 } from 'react-native';
+var buffer = require('buffer');
 
 const styles = StyleSheet.create({
 	stretch: {
@@ -18,7 +19,11 @@ const styles = StyleSheet.create({
 		height: 200
 	},
 	heading:{
-		fontSize:30,
+		fontSize:30
+	},
+	error:{
+		color:'red',
+		marginTop:20
 	},
 	button:{
 		height:50,
@@ -29,7 +34,7 @@ const styles = StyleSheet.create({
 		justifyContent:'center'
 	},
 	loading:{
-		marginTop:20,
+		marginTop:20
 	},
 	textButton:{
 		color:'white',
@@ -49,6 +54,14 @@ class Login extends Component {
 		this.state = { showProgress: false };
 	}
 	render() {
+		var errorCtrl = <Text></Text>;
+		if (this.state.err === 'badCredentials') {
+			errorCtrl = <Text style={styles.error}>Incorrect username or password</Text>;
+		}
+		if (this.state.err === 'unexpectedError') {
+			errorCtrl = <Text style={styles.error}>Login Failed, unknown error</Text>
+		}
+
 		return (
 			<View style={{alignItems: 'center', padding:50}}>
 				<Image style={styles.stretch} source={ require('./img/octocat.png') } />
@@ -67,13 +80,42 @@ class Login extends Component {
 					onPress={this.onLoginSubmit.bind(this)}>
 					<Text style={styles.textButton}>Log in!</Text>
 				</ TouchableHighlight >
+				{errorCtrl}
 				<ActivityIndicatorIOS animating={this.state.showProgress} size="large" style={styles.loading}/>
 			</View>
 		);
 	}
 	onLoginSubmit(){
-		console.log("Attempting login with user " + this.state.username +" and pass "+ this.state.password);
 		this.setState({showProgress: true});
+		var base64 = buffer.Buffer(this.state.username + ':' + this.state.password);
+		var encodedAuth = base64.toString('base64');
+
+		fetch('https://api.github.com/user', {
+			headers:{
+				'Authorization': 'Basic ' + encodedAuth
+			}
+		})
+		.then((response) => {
+			if (response.status >= 200 && response.status < 300) {
+				return response.json();
+			}
+			if (response.status == 401) {
+				throw 'badCredentials'
+			}
+			if (response.status =! 401) {
+				throw 'unexpectedError'
+			}
+		})
+		.then((results) => {
+			console.log(results);
+			this.setState({successLogin: true});
+		})
+		.catch((err) => {
+			this.setState({err});
+		})
+		.finally(() => {
+			this.setState({showProgress: false});
+		})
 	}
 }
 
