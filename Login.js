@@ -7,6 +7,7 @@ import {
   Text,
   TextInput,
   TouchableHighlight,
+  ActivityIndicatorIOS,
   Image,
   View
 } from 'react-native';
@@ -27,6 +28,9 @@ const styles = StyleSheet.create({
 		marginTop:20,
 		justifyContent:'center'
 	},
+	loading:{
+		marginTop:20,
+	},
 	textButton:{
 		color:'white',
 		fontSize:17,
@@ -40,18 +44,36 @@ const styles = StyleSheet.create({
 });
 
 class Login extends Component {
+	constructor(props) {
+		super(props);
+		this.state = { showProgress: false };
+	}
 	render() {
 		return (
 			<View style={{alignItems: 'center', padding:50}}>
-				<Image style={styles.stretch} source={require('./img/octocat.png')} />
+				<Image style={styles.stretch} source={ require('./img/octocat.png') } />
 				<Text style={styles.heading}>Github Search</Text>
-				<TextInput style={styles.input} placeholder="GitHub Username"/>
-				<TextInput style={styles.input} secureTextEntry="true" placeholder="GitHub Password"/>
-				<TouchableHighlight style={styles.button}>
+				<TextInput
+					style={styles.input}
+					onChangeText={(text) => this.setState({username: text})}
+					placeholder="GitHub Username"/>
+				<TextInput
+					style={styles.input}
+					onChangeText={(text)=> this.setState({password: text})}
+					secureTextEntry={true}
+					placeholder="GitHub Password"/>
+				<TouchableHighlight
+					style={styles.button}
+					onPress={this.onLoginSubmit.bind(this)}>
 					<Text style={styles.textButton}>Log in!</Text>
 				</ TouchableHighlight >
+				<ActivityIndicatorIOS animating={this.state.showProgress} size="large" style={styles.loading}/>
 			</View>
 		);
+	}
+	onLoginSubmit(){
+		console.log("Attempting login with user " + this.state.username +" and pass "+ this.state.password);
+		this.setState({showProgress: true});
 	}
 }
 
