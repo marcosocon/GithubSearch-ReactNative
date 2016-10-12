@@ -98,7 +98,9 @@ class Login extends Component {
 							password: this.state.password},
 							(results) => {
 								this.setState(Object.assign({showProgress: false}, results))
-								console.log(this.state);
+								if (this.state.successLogin && this.props.onLogin) {
+									this.props.onLogin();
+								}
 							});
 
 	}
