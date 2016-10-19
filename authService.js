@@ -9,11 +9,22 @@ class AuthService {
 	getAuthInfo(cb){
 		AsyncStorage.multiGet([authKey, userKey], (err, val)=>{
 			if (err) {
-				return cb(err)
+				return cb(err);
 			}
 			if (!val) {
 				return cb();
 			}
+			var zippedObj = _.zipObject(val);
+			if (!zippedObj.authKey) {
+				return cb();
+			}
+			var authInfo = {
+				header:{
+					Authorization: 'Basic ' + zippedObj.authKey
+				},
+				user: JSON.parse(zippedObj.userKey)
+			};
+			return cb(null, authInfo);
 		});
 	}
 	login(creds, cb){
@@ -45,7 +56,6 @@ class AuthService {
 					return cb({successLogin: true, results: results});
 				});
 			}
-			console.log(AsyncStorage);
 		})
 		.catch((err) => {
 			return cb({err:err, successLogin: false });

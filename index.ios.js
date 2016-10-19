@@ -9,17 +9,34 @@ import {
 	AppRegistry,
 	StyleSheet,
 	Text,
+	ActivityIndicatorIOS,
 	View
 } from 'react-native';
 import Login from './Login.js';
+var AuthService = require('./authService');
+
 
 
 class githubSearch extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { isLoggedIn: false };
+		this.state = { isLoggedIn: false, checkingAuth: true };
+	}
+	componentDidMount() {
+		AuthService.getAuthInfo((err, authInfo)=>{
+			this.setState({ checkingAuth: false,
+							isLoggedIn: authInfo !== null
+						});
+		});
 	}
 	render() {
+		if (this.state.checkingAuth) {
+			return(
+				<View style={{alignItems: 'center', padding:50}}>
+					<ActivityIndicatorIOS animating={true} size="large" style={styles.loading} />
+				</View>
+			)
+		}
 		if (this.state.isLoggedIn) {
 			return(
 				<View style={{alignItems: 'center', padding:50}}>
