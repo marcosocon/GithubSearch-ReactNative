@@ -12,10 +12,10 @@ import {
 	ActivityIndicatorIOS,
 	View
 } from 'react-native';
+
 import Login from './Login.js';
-var AuthService = require('./authService');
-
-
+import AuthService from './authService';
+import AppContainer from './AppContainer';
 
 class githubSearch extends Component {
 	constructor(props) {
@@ -25,7 +25,7 @@ class githubSearch extends Component {
 	componentDidMount() {
 		AuthService.getAuthInfo((err, authInfo)=>{
 			this.setState({ checkingAuth: false,
-							isLoggedIn: authInfo !== null
+							isLoggedIn: false
 						});
 		});
 	}
@@ -39,9 +39,7 @@ class githubSearch extends Component {
 		}
 		if (this.state.isLoggedIn) {
 			return(
-				<View style={{alignItems: 'center', padding:50}}>
-					<Text>Github Searchs</Text>
-				</View>
+				<AppContainer />
 			)
 		} else {
 			return (
